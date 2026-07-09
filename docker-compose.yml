@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: metromind_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/app/metromind.db
+      - CHROMA_DB_DIR=/app/app/chromadb_storage
+      - UPLOAD_DIR=/app/app/uploads
+      - JWT_SECRET_KEY=kmrl_metromind_ai_super_secure_secret_key_2026
+      - MOCK_AI_MODE=True # Toggle to False when deploying with active OpenAI Keys
+      - OPENAI_API_KEY=
+    volumes:
+      - backend_data:/app/app
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: metromind_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  backend_data:
